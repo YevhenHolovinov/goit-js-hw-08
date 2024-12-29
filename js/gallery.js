@@ -62,5 +62,70 @@ const images = [
         'https://cdn.pixabay.com/photo/2019/05/17/04/35/lighthouse-4208843_1280.jpg',
       description: 'Lighthouse Coast Sea',
     },
-  ]; 
+  ];
   
+  const gallery = document.querySelector('.gallery');
+  
+  const markup = images.map(image => {
+    return `<li class="gallery-item">
+  <a class="gallery-link" href="${image.original}">
+    <img
+      class="gallery-image"
+      src="${image.preview}"
+      data-source="${image.original}"
+      alt="${image.description}"
+    />
+  </a>
+</li>`;
+  });
+  
+gallery.insertAdjacentHTML('beforeend', markup.join(''));
+
+gallery.addEventListener('click', event => {
+  event.preventDefault();
+  if (event.target.nodeName === 'IMG') {
+    openModal(event.target.dataset.source);
+  }
+});
+
+document.addEventListener('keydown', event => {
+  const modal = document.querySelector('.modal');
+  if (
+    event.code === 'Enter' ||
+    event.code === 'NumpadEnter' ||
+    (event.code === 'Space' && !modal)
+  ) {
+    openModal(event.target.querySelector('img').dataset.source);
+  }
+});
+
+function openModal(src) {
+  const instance = basicLightbox.create(
+    `
+    	<img src="${src}" width="1112" height="640">
+    `,
+    {
+      className: 'modal',
+
+      onShow: instance => {
+        document.addEventListener('keydown', onEscapePress);
+      },
+
+      onClose: instance => {
+        document.addEventListener('keydown', onEscapePress);
+      },
+    }
+  );
+
+  instance.show();
+
+  function onEscapePress(event) {
+    if (event.code === 'Escape') {
+      instance.close();
+    }
+  }
+}
+
+function removeFirstLaseChar(string) {
+  return string.slice(1, string.length - 1);
+}
